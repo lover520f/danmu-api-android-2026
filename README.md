@@ -181,17 +181,17 @@ cd danmu-api-android
 Node 运行时使用 **26.11.1 lite + OpenSSL 4.0.3（原生 ECH/H3）**，锁定
 `fogtape/nodejs-mobile` 的 `openssl4/node26.11.1` 分支提交 `a8a46ef5`，
 Actions run `38674319285`、artifact `11945892508`。运行时来自该固定开发提交，
-同一 ZIP 已作为 App `v1.0.5.115` 的发行附件保存；归档内容和 SHA-256 保持一致。
+App 发行附件仅提供三个架构的 APK；运行时 ZIP 不随 App 发行上传。
 来源及 SHA-256 见
 `app/native-runtime-sources.properties`、`app/native-runtime.sha256` 和
 `app/native-runtime-provenance.json`。JNI 桥使用同份 ZIP 的头文件与 NDK r29
 重新编译，libc++、libc++abi、libunwind 由 `scripts/build-native-deps.py` 从固定源码重建。
 
 离线构建可将校验通过的 `nodejs-mobile-android-lite-a8a46ef5.zip` 放入
-`dist/nodejs-mobile/openssl4-v26.11.1-a8a46ef5-lite/`。缺少本地或 Gradle 缓存时，从 App 固定发行附件下载，无需登录 `gh`；
+`dist/nodejs-mobile/openssl4-v26.11.1-a8a46ef5-lite/`。缺少本地或 Gradle 缓存时，从固定上游 Actions 归档下载，需要已认证的 `gh`；
 C++ 依赖源码缓存也必须预先准备并通过指纹校验。构建不提取旧 APK 的原生库。
 
-构建机不需要登录 GitHub CLI：可以显式指定已经准备好的运行时 ZIP，或指向同一 ZIP 的固定 HTTPS 下载地址。
+构建机也可以显式指定已经准备好的运行时 ZIP，或指向同一 ZIP 的固定 HTTPS 下载地址，这两种方式无需登录 GitHub CLI。
 这两个入口都继续校验来源清单中的归档大小和 SHA-256，不更换运行时版本或接受其他内容：
 
 ```bash
@@ -203,7 +203,7 @@ C++ 依赖源码缓存也必须预先准备并通过指纹校验。构建不提�
 ```
 
 显式指定的本地文件校验失败会直接报错，不使用缓存代替。公开地址只覆盖下载位置，不能覆盖固定摘要。
-当前来源清单固定指向 App `v1.0.5.115` 的公开 ZIP；上游原始 Actions 来源保留在 provenance 记录中。
+当前来源清单与 provenance 记录均指向固定上游 Actions 归档。Actions 归档有保留期限，长期或离线构建应保留校验通过的本地 ZIP。
 
 手机测试包可用 `-PabiFilters=arm64-v8a` 构建。产出后运行
 `python3 scripts/verify-apk-native.py app/build/outputs/apk/release/app-arm64-v8a-release.apk`，
